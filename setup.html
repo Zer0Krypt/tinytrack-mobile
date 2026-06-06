@@ -149,15 +149,15 @@
     </ol>
   </div>
 
-  <!-- Step 2: Enter server address in app -->
+  <!-- Step 2: Open the app -->
   <div class="step">
     <div class="step-header">
       <div class="step-num">2</div>
-      <div class="step-title">Connect to Home Server</div>
+      <div class="step-title">Open TinyTrack</div>
     </div>
-    <p>Your home server address is shown below. Open TinyTrack on your phone, go to <strong>Settings → Home Server</strong>, and enter this address.</p>
-    <div class="url-box" id="server-url">Loading…</div>
-    <p style="font-size:13px;color:#6b7280;margin-bottom:0">Or scan the QR code in the desktop app tray to open TinyTrack with the address pre-filled.</p>
+    <p id="open-step-desc">Loading…</p>
+    <a href="#" class="btn btn-blue" id="open-app-btn" style="display:none">Open TinyTrack in Safari →</a>
+    <div class="url-box" id="app-url" style="display:none"></div>
   </div>
 
   <!-- Step 3: Add to Home Screen -->
@@ -166,7 +166,7 @@
       <div class="step-num">3</div>
       <div class="step-title">Add to Home Screen</div>
     </div>
-    <p>Open TinyTrack in Safari, then add it to your home screen so it works like a real app.</p>
+    <p>From that Safari tab, add TinyTrack to your home screen so it works like a real app.</p>
     <ol class="sub-steps">
       <li>Tap the <strong>Share</strong> button <strong>⬆</strong> at the bottom of Safari</li>
       <li>Scroll down and tap <strong>Add to Home Screen</strong></li>
@@ -196,7 +196,23 @@
 
   <script>
     var serverUrl = 'https://' + window.location.hostname + ':3000'
-    document.getElementById('server-url').textContent = serverUrl
+    var params = new URLSearchParams(window.location.search)
+    var cdnUrl = (params.get('cdn') || '').replace(/\/$/, '')
+
+    var descEl = document.getElementById('open-step-desc')
+    var btnEl  = document.getElementById('open-app-btn')
+    var urlEl  = document.getElementById('app-url')
+
+    if (cdnUrl) {
+      var appUrl = cdnUrl + '/?server=' + encodeURIComponent(serverUrl)
+      descEl.textContent = 'Tap the button below to open TinyTrack. Your home server address will be saved automatically.'
+      btnEl.href = appUrl
+      btnEl.style.display = 'block'
+    } else {
+      descEl.innerHTML = 'Open TinyTrack at the address below in Safari. If you haven\'t set up a mobile app URL in the desktop settings yet, do that first.'
+      urlEl.textContent = serverUrl
+      urlEl.style.display = 'block'
+    }
   </script>
 </body>
 </html>
