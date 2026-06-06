@@ -1,0 +1,10 @@
+{
+  "name": "TinyTrack",
+  "short_name": "TinyTrack",
+  "description": "Privacy-first baby activity tracker",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f9fc",
+  "theme_color": "#5b8ef0",
+  "orientation": "portrait-primary"
+}
