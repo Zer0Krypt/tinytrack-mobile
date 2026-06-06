@@ -15,10 +15,7 @@
       padding: 28px 16px 56px;
     }
 
-    .header {
-      text-align: center;
-      margin-bottom: 28px;
-    }
+    .header { text-align: center; margin-bottom: 28px; }
     .logo { font-size: 52px; line-height: 1; margin-bottom: 10px }
     .header h1 { font-size: 26px; font-weight: 700 }
     .header p { font-size: 14px; color: #6b7280; margin-top: 4px }
@@ -30,13 +27,7 @@
       margin-bottom: 14px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.07);
     }
-
-    .step-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
+    .step-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
     .step-num {
       width: 38px; height: 38px;
       border-radius: 50%;
@@ -48,79 +39,48 @@
       flex-shrink: 0;
     }
     .step-title { font-size: 18px; font-weight: 600 }
-
-    .step p {
-      font-size: 14px;
-      color: #4b5563;
-      line-height: 1.55;
-      margin-bottom: 14px;
-    }
+    .step p { font-size: 14px; color: #4b5563; line-height: 1.55; margin-bottom: 14px; }
 
     .btn {
-      display: block;
-      width: 100%;
-      padding: 15px;
-      border-radius: 13px;
-      border: none;
-      font-size: 16px;
-      font-weight: 600;
-      text-align: center;
-      text-decoration: none;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
+      display: block; width: 100%; padding: 15px;
+      border-radius: 13px; border: none;
+      font-size: 16px; font-weight: 600;
+      text-align: center; text-decoration: none;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
     .btn-blue { background: #5b8ef0; color: #fff }
     .btn-blue:active { background: #4b7de0 }
 
     .url-box {
-      background: #f0f4ff;
-      border: 1px solid #c7d2fe;
-      border-radius: 10px;
-      padding: 12px 14px;
+      background: #f0f4ff; border: 1px solid #c7d2fe;
+      border-radius: 10px; padding: 12px 14px;
       font-family: 'SF Mono', 'Menlo', 'Courier New', monospace;
-      font-size: 15px;
-      color: #3730a3;
-      word-break: break-all;
-      margin-bottom: 14px;
-      text-align: center;
+      font-size: 15px; color: #3730a3;
+      word-break: break-all; margin-bottom: 14px; text-align: center;
     }
 
-    .sub-steps {
-      list-style: none;
-      counter-reset: sub;
-      margin-top: 12px;
-    }
+    .sub-steps { list-style: none; counter-reset: sub; margin-top: 12px; }
     .sub-steps li {
       counter-increment: sub;
-      display: flex;
-      gap: 10px;
-      font-size: 14px;
-      color: #4b5563;
-      margin-bottom: 10px;
-      line-height: 1.45;
-      align-items: flex-start;
+      display: flex; gap: 10px;
+      font-size: 14px; color: #4b5563;
+      margin-bottom: 10px; line-height: 1.45; align-items: flex-start;
     }
     .sub-steps li::before {
       content: counter(sub);
       min-width: 22px; height: 22px;
-      background: #e5e7eb;
-      border-radius: 50%;
-      font-size: 12px;
-      font-weight: 600;
+      background: #e5e7eb; border-radius: 50%;
+      font-size: 12px; font-weight: 600;
       display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      margin-top: 1px;
+      flex-shrink: 0; margin-top: 1px;
     }
 
     strong { font-weight: 600; color: #1f2937 }
 
     .footer-note {
-      font-size: 12px;
-      color: #9ca3af;
-      text-align: center;
-      margin-top: 28px;
-      padding: 0 8px;
-      line-height: 1.6;
+      font-size: 12px; color: #9ca3af;
+      text-align: center; margin-top: 28px;
+      padding: 0 8px; line-height: 1.6;
     }
   </style>
 </head>
@@ -129,30 +89,13 @@
   <div class="header">
     <div class="logo">🐣</div>
     <h1>TinyTrack</h1>
-    <p>One-time mobile setup — takes about 3 minutes</p>
+    <p>One-time mobile setup — takes about 1 minute</p>
   </div>
 
-  <!-- Step 1: Install Certificate -->
+  <!-- Step 1: Open TinyTrack -->
   <div class="step">
     <div class="step-header">
       <div class="step-num">1</div>
-      <div class="step-title">Install Certificate</div>
-    </div>
-    <p>TinyTrack uses a secure local connection. Install this certificate so your phone trusts it.</p>
-    <a href="/ca.pem" class="btn btn-blue">Download Certificate →</a>
-    <ol class="sub-steps">
-      <li>Tap <strong>Download Certificate</strong> above — a file download prompt will appear</li>
-      <li>Go to <strong>Settings → General → VPN &amp; Device Management</strong></li>
-      <li>Tap <strong>TinyTrack Local CA</strong> and tap <strong>Install</strong></li>
-      <li>Go to <strong>Settings → General → About → Certificate Trust Settings</strong></li>
-      <li>Enable full trust for <strong>TinyTrack Local CA</strong></li>
-    </ol>
-  </div>
-
-  <!-- Step 2: Open the app -->
-  <div class="step">
-    <div class="step-header">
-      <div class="step-num">2</div>
       <div class="step-title">Open TinyTrack</div>
     </div>
     <p id="open-step-desc">Loading…</p>
@@ -160,10 +103,10 @@
     <div class="url-box" id="app-url" style="display:none"></div>
   </div>
 
-  <!-- Step 3: Add to Home Screen -->
+  <!-- Step 2: Add to Home Screen -->
   <div class="step">
     <div class="step-header">
-      <div class="step-num">3</div>
+      <div class="step-num">2</div>
       <div class="step-title">Add to Home Screen</div>
     </div>
     <p>From that Safari tab, add TinyTrack to your home screen so it works like a real app.</p>
@@ -174,10 +117,10 @@
     </ol>
   </div>
 
-  <!-- Step 4: Prime the cache -->
+  <!-- Step 3: Enable Offline Mode -->
   <div class="step">
     <div class="step-header">
-      <div class="step-num">4</div>
+      <div class="step-num">3</div>
       <div class="step-title">Enable Offline Mode</div>
     </div>
     <p>Open TinyTrack from your <strong>Home Screen icon</strong> once while on home WiFi.</p>
@@ -186,16 +129,16 @@
       <li>Stay on the app for about <strong>10–15 seconds</strong></li>
       <li>You'll see a small message: <strong>"App ready for offline use"</strong></li>
     </ol>
-    <p style="margin-top:14px;font-size:14px;color:#4b5563">Once you see that message, TinyTrack will open instantly even when away from home.</p>
+    <p style="margin-top:14px;font-size:14px;color:#4b5563">Once you see that message, TinyTrack opens instantly even when away from home.</p>
   </div>
 
   <p class="footer-note">
-    That's it — one-time setup complete.<br>
+    That's it — no certificates, no technical steps.<br>
     TinyTrack opens instantly from your home screen, even on cellular.
   </p>
 
   <script>
-    var serverUrl = 'https://' + window.location.hostname + ':3000'
+    var serverUrl = 'http://' + window.location.hostname + ':3000'
     var params = new URLSearchParams(window.location.search)
     var cdnUrl = (params.get('cdn') || '').replace(/\/$/, '')
 
@@ -209,8 +152,8 @@
       btnEl.href = appUrl
       btnEl.style.display = 'block'
     } else {
-      descEl.innerHTML = 'Open TinyTrack at the address below in Safari. If you haven\'t set up a mobile app URL in the desktop settings yet, do that first.'
-      urlEl.textContent = serverUrl
+      descEl.innerHTML = 'Open your TinyTrack mobile app URL in Safari. You can find it in the desktop app under Settings → Mobile Setup.'
+      urlEl.textContent = cdnUrl || serverUrl
       urlEl.style.display = 'block'
     }
   </script>

@@ -1,12 +1,8 @@
 ;(function () {
   'use strict'
 
-  function serverUrl() {
-    return (localStorage.getItem('tinytrack-server-url') || '').replace(/\/$/, '')
-  }
-
   async function request(method, path, body) {
-    const url = serverUrl() + path
+    const url = path
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), 5000)
     const opts = { method, headers: { 'Content-Type': 'application/json' }, signal: controller.signal }

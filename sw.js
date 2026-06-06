@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tinytrack-v4'
+const CACHE_NAME = 'tinytrack-v5'
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -21,14 +21,36 @@ const STATIC_ASSETS = [
   '/vendor/chartjs/chart.umd.js',
 ]
 
+// The local Electron server URL, e.g. "http://192.168.1.100:3000".
+// Persisted in the SW cache so it survives worker restarts.
+let _serverUrl = ''
+
+async function getServerUrl() {
+  if (_serverUrl) return _serverUrl
+  try {
+    const cached = await caches.match('/__sw-config')
+    if (cached) _serverUrl = (await cached.json()).serverUrl || ''
+  } catch (_) {}
+  return _serverUrl
+}
+
+async function setServerUrl(url) {
+  _serverUrl = url
+  const cache = await caches.open(CACHE_NAME)
+  await cache.put('/__sw-config', new Response(JSON.stringify({ serverUrl: url }), {
+    headers: { 'Content-Type': 'application/json' },
+  }))
+}
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SET_SERVER_URL') setServerUrl(event.data.url)
+})
+
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
-      // Cache each asset individually so one failure doesn't abort the whole install
       await Promise.all(
-        STATIC_ASSETS.map(url =>
-          cache.add(url).catch(() => null)
-        )
+        STATIC_ASSETS.map(url => cache.add(url).catch(() => null))
       )
     }).then(() => self.skipWaiting())
   )
@@ -40,7 +62,6 @@ self.addEventListener('activate', (e) => {
       .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
       .then(() => {
-        // Notify all open tabs that the app is ready for offline use
         return self.clients.matchAll({ includeUncontrolled: true }).then(clients => {
           clients.forEach(c => c.postMessage({ type: 'SW_READY' }))
         })
@@ -51,18 +72,13 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url)
 
-  // Navigation requests: serve app shell from cache so the app loads
-  // even when the home server is unreachable (off local network).
+  // Navigation: cache-first, background refresh
   if (e.request.mode === 'navigate') {
     e.respondWith((async () => {
       const cached = await caches.match('/')
       if (cached) {
-        // Serve from SW cache immediately, but also fire a real network request
-        // so iOS's HTTP disk cache stays populated. On iOS cold launch the SW
-        // may not intercept the first navigation; the HTTP disk cache is the
-        // only fallback, and it is only populated by actual network responses.
         fetch(e.request.url).then(r => {
-          if (r && r.ok) caches.open(CACHE_NAME).then(c => c.put('/', r))
+          if (r?.ok) caches.open(CACHE_NAME).then(c => c.put('/', r))
         }).catch(() => null)
         return cached
       }
@@ -79,23 +95,44 @@ self.addEventListener('fetch', (e) => {
     return
   }
 
-  // API requests: network-only; return a structured offline error when unreachable.
+  // API requests: proxy to local Electron server via stored server URL.
+  // Service workers can fetch HTTP URLs even when the SW origin is HTTPS.
   if (url.pathname.startsWith('/api/')) {
-    e.respondWith(
-      fetch(e.request).catch(() => new Response(JSON.stringify({ error: 'offline' }), {
-        status: 503,
-        headers: { 'Content-Type': 'application/json' },
-      }))
-    )
+    e.respondWith((async () => {
+      const serverUrl = await getServerUrl()
+      if (!serverUrl) {
+        return new Response(JSON.stringify({ error: 'offline' }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      const target = serverUrl.replace(/\/$/, '') + url.pathname + url.search
+      try {
+        const body = ['GET', 'HEAD'].includes(e.request.method)
+          ? undefined
+          : await e.request.clone().arrayBuffer()
+        const response = await fetch(target, {
+          method: e.request.method,
+          headers: e.request.headers,
+          body,
+        })
+        return response
+      } catch (_) {
+        return new Response(JSON.stringify({ error: 'offline' }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }
+    })())
     return
   }
 
-  // Static assets: cache-first, opportunistically update cache on network hit.
+  // Static assets: cache-first, opportunistic update
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached
       return fetch(e.request).then(response => {
-        if (response && response.status === 200) {
+        if (response?.status === 200) {
           const clone = response.clone()
           caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone))
         }

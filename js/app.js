@@ -29,9 +29,13 @@
       localStorage.setItem('tinytrack-server-url', cleaned)
     }
 
-    // Register service worker (requires HTTPS — works when served from CDN)
+    // Register service worker (works when served from HTTPS — i.e. the CDN)
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js').catch(() => null)
+
+      // Push the stored server URL into the SW so it can proxy API calls
+      const storedServer = localStorage.getItem('tinytrack-server-url')
+      if (storedServer) notifySWServerUrl(storedServer)
 
       if (window.navigator.standalone === true && !localStorage.getItem('tinytrack-offline-ready')) {
         navigator.serviceWorker.addEventListener('message', (event) => {
@@ -99,6 +103,11 @@
 
     TinyTrack.Router.navigate('log')
     applyHandedness()
+  }
+
+  function notifySWServerUrl(url) {
+    if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) return
+    navigator.serviceWorker.controller.postMessage({ type: 'SET_SERVER_URL', url })
   }
 
   function showOfflineReadyToast() {
@@ -437,10 +446,10 @@
     if (saveServerUrlBtn && serverUrlInput) {
       saveServerUrlBtn.addEventListener('click', () => {
         let url = serverUrlInput.value.trim().replace(/\/$/, '')
-        if (url && !url.startsWith('http')) url = 'https://' + url
+        if (url && !url.startsWith('http')) url = 'http://' + url
         localStorage.setItem('tinytrack-server-url', url)
         serverUrlInput.value = url
-        // Re-check connectivity with the new server URL
+        notifySWServerUrl(url)
         state.online = navigator.onLine
         if (state.online && state.activeBaby) runSync()
         else updateConnectivityIndicator()
